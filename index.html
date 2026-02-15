@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
+  <div id="scale-wrapper">
   <!-- Global fixed header (logo + step icons) -->
   <header class="topbar" id="topbar" aria-hidden="false">
     <div class="topbar-inner">
@@ -41,20 +42,20 @@
     <section id="screen-consent" class="screen" data-screen="consent">
       <div class="panel">
         <h1 class="panel-title">동의서</h1>
-        <p class="panel-desc">※ 여기에 3줄 설명 문구가 들어갑니다.</p>
+        <p class="panel-desc">본 작품은 19세기 체자레 롬브로소의 범죄학 이론을 비판적으로 재해석한 예술 작품입니다. 시스템이 제시하는 '범죄형', '위험도', '성향' 등의 분석 결과는 예술적 허구(Fiction)이며, 실제 과학적 근거가 없음을 고지합니다. 관람객은 이에 동의하며 참여합니다.</p>
 
         <div class="consent-list">
           <label class="check">
             <input type="checkbox" class="consent" />
-            <span>동의 항목 1 (추후 텍스트 삽입)</span>
+            <span>생체 정보 수집 및 분석에 동의함</span>
           </label>
           <label class="check">
             <input type="checkbox" class="consent" />
-            <span>동의 항목 2 (추후 텍스트 삽입)</span>
+            <span>결과 데이터의 전시장 내 송출에 동의함</span>
           </label>
           <label class="check">
             <input type="checkbox" class="consent" />
-            <span>동의 항목 3 (추후 텍스트 삽입)</span>
+            <span>분석 결과가 예술적 허구임을 인지함</span>
           </label>
         </div>
 
@@ -152,6 +153,7 @@
   </div>
 </section>
   </main>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 <script src="js/app.js" defer></script>

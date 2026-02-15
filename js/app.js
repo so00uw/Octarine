@@ -638,29 +638,30 @@ els.btnRestartFinal?.addEventListener("click", () => {
   // Keep safe if projection window is reloaded: re-clear
   window.addEventListener("focus", () => postToProjection("PING"));
   
-// [추가] 브라우저 창 크기에 맞춰 모든 요소를 리사이징하는 함수
-function resizeApp() {
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-  const standardRatio = 1920 / 1080;
-  const windowRatio = width / height;
+// ---- [새로 추가] 브라우저 창 크기에 맞춰 전체 화면 스케일링 ----
+  function resizeApp() {
+    const wrapper = document.getElementById('scale-wrapper');
+    if (!wrapper) return;
 
-  let scale = 1;
-  if (windowRatio > standardRatio) {
-    // 창이 더 넓을 때 (세로 기준)
-    scale = height / 1080;
-  } else {
-    // 창이 더 좁을 때 (가로 기준)
-    scale = width / 1920;
+    const windowRatio = window.innerWidth / window.innerHeight;
+    const standardRatio = 1920 / 1080;
+    let scale = 1;
+
+    // 창 비율에 맞춰 가로/세로 중 꽉 차는 쪽을 기준으로 스케일 계산
+    if (windowRatio > standardRatio) {
+      scale = window.innerHeight / 1080;
+    } else {
+      scale = window.innerWidth / 1920;
+    }
+
+    // 도화지에 scale 적용
+    wrapper.style.transform = `scale(${scale})`;
   }
-  
-  // .app에 계산된 scale 값을 전달
-  document.querySelector('.app').style.setProperty('--app-scale', scale);
-}
 
-// 초기 실행 및 창 크기 변경 시 실행
-window.addEventListener('resize', resizeApp);
-resizeApp();
+  window.addEventListener('resize', resizeApp);
+  resizeApp(); // 시작할 때 한 번 실행
+  // -----------------------------------------------------------
+
   // Start at start screen
   setScreen("start");
 })();
