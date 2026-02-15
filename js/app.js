@@ -637,7 +637,30 @@ els.btnRestartFinal?.addEventListener("click", () => {
 
   // Keep safe if projection window is reloaded: re-clear
   window.addEventListener("focus", () => postToProjection("PING"));
+  
+// [추가] 브라우저 창 크기에 맞춰 모든 요소를 리사이징하는 함수
+function resizeApp() {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const standardRatio = 1920 / 1080;
+  const windowRatio = width / height;
 
+  let scale = 1;
+  if (windowRatio > standardRatio) {
+    // 창이 더 넓을 때 (세로 기준)
+    scale = height / 1080;
+  } else {
+    // 창이 더 좁을 때 (가로 기준)
+    scale = width / 1920;
+  }
+  
+  // .app에 계산된 scale 값을 전달
+  document.querySelector('.app').style.setProperty('--app-scale', scale);
+}
+
+// 초기 실행 및 창 크기 변경 시 실행
+window.addEventListener('resize', resizeApp);
+resizeApp();
   // Start at start screen
   setScreen("start");
 })();
