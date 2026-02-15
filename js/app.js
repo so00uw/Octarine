@@ -61,6 +61,8 @@
     updateStepIcons(next);
 
     document.body.dataset.screen = next;
+    // 새로 추가한 6단계 시퀀스 제어 함수 호출
+    showScreen(next);
     
 
     // When entering start, try ensure projection window (won't reopen multiple tabs because name fixed)
@@ -255,7 +257,7 @@ function onFaceResults(results) {
   const lm = faces[0];
   lastLandmarks = lm;
 
-  // 얼굴 bbox in normalized coords
+  // 얼굴 위치 및 크기 계산 (이 계산이 아래 로직보다 먼저 와야 합니다)
   let minX = 1, maxX = 0, minY = 1, maxY = 0;
   for (const p of lm) {
     if (p.x < minX) minX = p.x;
@@ -268,7 +270,6 @@ function onFaceResults(results) {
   const cx = ((minX + maxX) / 2) * SCAN.camW;
   const cy = ((minY + maxY) / 2) * SCAN.camH;
 
-  // guide frame relative to camera box
   const guide = {
     left: SCAN.guideAbs.left - SCAN.camAbs.left,
     top: SCAN.guideAbs.top - SCAN.camAbs.top,
@@ -286,19 +287,41 @@ function onFaceResults(results) {
   const tooBig = faceW > guide.width * 0.75;
   const sizeOK = !tooSmall && !tooBig;
 
-  if (inside && sizeOK) stableFrames++;
-  else stableFrames = 0;
-
-  if (stableFrames >= SCAN.stableNeed) {
-    setCaptureState(true, "");
+  // --- [수정된 자동 촬영 및 좌표 전송 로직] ---
+  if (inside && sizeOK) {
+    stableFrames++;
   } else {
-    if (!inside) setCaptureState(false, "얼굴을 네모 안에 맞춰줘");
-    else if (tooSmall) setCaptureState(false, "더 가까이 와!");
-    else if (tooBig) setCaptureState(false, "멀어져라");
-    else setCaptureState(false, "잠시만 고정해줘");
+    stableFrames = 0;
   }
-}
-// =========================
+
+  // 약 3~4초 유지 (100프레임 기준)
+  if (stableFrames >= 100) { 
+    const { video } = getScanEls();
+    const temp = document.createElement("canvas");
+    temp.width = SCAN.snapW;
+    temp.height = SCAN.snapH;
+    const tctx = temp.getContext("2d");
+    tctx.drawImage(video, 0, 0, SCAN.snapW, SCAN.snapH);
+    
+    capturedImageDataUrl = temp.toDataURL("image/png");
+    capturedLandmarks = JSON.parse(JSON.stringify(lastLandmarks));
+
+    // 프로젝션 창에 촬영 이미지 전송
+    postToProjection("SHOW_RESULT_FRAME", { image: capturedImageDataUrl });
+
+    stableFrames = 0;
+    setScreen("analyze");
+  } else {
+    // 실시간 좌표만 전송 (에러 방지를 위해 비디오 객체 제외)
+    postToProjection("UPDATE_FACE", { landmarks: lm });
+    
+    // UI 힌트 업데이트
+    if (!inside) setCaptureState(false, "얼굴을 네모 안에 맞추십시오");
+    else if (tooSmall) setCaptureState(false, "가까이 오십시오");
+    else if (tooBig) setCaptureState(false, "멀어져라");
+    else setCaptureState(false, `분석 중... 잠시만 고정 (${Math.floor(stableFrames/25)}s)`);
+  }
+}// =========================
 // Analyze (5s scan line + logs) lifecycle
 // =========================
 let analyzeTimer = null;
@@ -342,65 +365,39 @@ function fillLogStream(el, linesCount){
   el.textContent = lines.join("\n");
 }
 
-function startAnalyze(){
-  const { photo, line, clean, integ, diagn } = getAnalyzeEls();
-  if (!photo || !line) return;
+// [수정] startAnalyze 함수 내부
+function startAnalyze() {
+    const { photo, line, clean, integ, diagn } = getAnalyzeEls();
+    if (!capturedImageDataUrl) { setScreen("start"); return; }
 
-  // 촬영 이미지가 없으면(예외) 그냥 결과로 넘기지 않고 start로 리셋하는 게 안전하지만,
-  // 지금은 analyze가 scan 후에만 오도록 되어있으니 기본은 그대로 진행.
-  if (!capturedImageDataUrl) {
-    // 안전 fallback
-    setScreen("start");
-    return;
-  }
+    photo.src = capturedImageDataUrl;
+    
+    // 1. 오른쪽 영역 (기존 폭포수 애니메이션 적용)
+    fillLogStream(diagn, 220); 
 
-  // 이미지 세팅
-  photo.src = capturedImageDataUrl;
-  photo.style.display = "block";
+    // 2. 왼쪽 영역 (새로 받은 한 줄씩 추가되는 텍스트 로직 적용)
+    const leftLogs = ["데이터 전송 중...", "알고리즘 분석 중...", "유전자 맵핑 중...", "결과 생성 완료"];
+    let logIdx = 0;
+    const logInterval = setInterval(() => {
+        if (logIdx < leftLogs.length) {
+            const lineA = document.createElement('div');
+            const lineB = document.createElement('div');
+            lineA.innerText = `> ${leftLogs[logIdx]}`;
+            lineB.innerText = `> SYSTEM_CHECK: ${Math.random().toString(16).slice(2, 8)}`;
+            clean.appendChild(lineA); // 왼쪽 상단
+            integ.appendChild(lineB); // 왼쪽 하단
+            logIdx++;
+        } else {
+            clearInterval(logInterval);
+        }
+    }, 800);
 
-  // 로그 채우기 (박스마다 밀도 조금 다르게)
-  fillLogStream(clean, 90);
-  fillLogStream(integ, 110);
-  fillLogStream(diagn, 220);
-
-  // 로그 스크롤 초기화
-  const logScroll = {
-    t0: performance.now(),
-    speedA: 90,   // px/s (좌상)
-    speedB: 110,  // px/s (좌하)
-    speedC: 140,  // px/s (우측)
-  };
-
-  function step(now){
-    const dt = (now - logScroll.t0) / 1000;
-    if (clean) clean.style.transform = `translateY(${-dt*logScroll.speedA}px)`;
-    if (integ) integ.style.transform = `translateY(${-dt*logScroll.speedB}px)`;
-    if (diagn) diagn.style.transform = `translateY(${-dt*logScroll.speedC}px)`;
-    analyzeRAF = requestAnimationFrame(step);
-  }
-
-  // 스캔 라인 5초 애니메이션 시작
-  line.style.display = "block";
-  line.style.transition = "none";
-  line.style.transform = "translateY(-10px)";
-  // 다음 프레임에 transition 적용
-  requestAnimationFrame(() => {
-    line.style.transition = "transform 5s linear";
-    line.style.transform = `translateY(${672 + 10}px)`; // camera-box 높이(672) + 여유
-  });
-
-  // 로그 스크롤 시작
-  if (analyzeRAF) cancelAnimationFrame(analyzeRAF);
-  logScroll.t0 = performance.now();
-  analyzeRAF = requestAnimationFrame(step);
-
-  // 5초 후 자동으로 result로 이동
-  if (analyzeTimer) clearTimeout(analyzeTimer);
-  analyzeTimer = setTimeout(() => {
-    setScreen("result");
-  }, 5000);
+    // [중요] 기존의 5초 강제 전환 setTimeout은 삭제하거나 주석 처리하세요.
+    // 대신 로직이 끝나는 시점에 결과로 넘깁니다.
+    setTimeout(() => {
+        setScreen("result");
+    }, 5000);
 }
-
 function stopAnalyze(){
   const { line } = getAnalyzeEls();
 
@@ -501,6 +498,32 @@ function calcCrime(intelScore){
 
   return scores;
 }
+/*** [ADD: 5단계 - 우생학 분석 알고리즘] */
+function runEugenicsAnalysis(landmarks) {
+    // 미간 거리 (landmark 133, 362) / 얼굴 가로폭 (landmark 234, 454)
+    const eyeDistance = Math.hypot(landmarks[362].x - landmarks[133].x, landmarks[362].y - landmarks[133].y);
+    const faceWidth = Math.hypot(landmarks[454].x - landmarks[234].x, landmarks[454].y - landmarks[234].y);
+    
+    const ratio = eyeDistance / faceWidth;
+    let result = {
+        grade: "B",
+        tendency: "일반적 성향",
+        score: Math.floor(ratio * 100)
+    };
+
+    // 가상의 '운명 판독' 로직
+    if (ratio > 0.15) {
+        result.grade = "S";
+        result.tendency = "잠재적 유죄 성향 (주의)";
+    } else if (ratio < 0.12) {
+        result.grade = "A";
+        result.tendency = "순응적 시민 성향";
+    }
+
+    return result;
+}
+/** [END: 5단계] **/
+
 // ---렌더링 함수 ---
 function renderResult(){
   const photo=document.getElementById("resultPhoto");
@@ -531,7 +554,48 @@ const intel=calcIntelligence(capturedLandmarks);
   });
 }
 
+/**
+ * [ADD: 6단계 - 인터랙션 시퀀스 제어]
+ */
+const screens = document.querySelectorAll('.screen');
 
+function showScreen(screenId) {
+    screens.forEach(s => s.classList.remove('is-active'));
+    document.getElementById(`screen-${screenId}`).classList.add('is-active');
+    
+    // 시퀀스별 자동 동작
+    if (screenId === 'scan') {
+        startTrackingSequence();
+    } else if (screenId === 'analyze') {
+        startProcessingSequence();
+    }
+}
+
+// 6-1. Tracking: 얼굴 인식 및 데이터 수집 (5초 대기)
+function startTrackingSequence() {
+    console.log("Tracking 시작...");
+    document.getElementById('scanHint').innerText = "데이터 추출 중... 정면을 유지하세요.";
+    
+}
+
+// 6-2. Processing: 분석 애니메이션 연출
+function startProcessingSequence() {
+    const logs = ["데이터 전송 중...", "알고리즘 분석 중...", "유전자 맵핑 중...", "결과 생성 완료"];
+    let logIdx = 0;
+    
+    const interval = setInterval(() => {
+        if (logIdx < logs.length) {
+            const logEl = document.createElement('div');
+            logEl.innerText = `> ${logs[logIdx]}`;
+            document.getElementById('logClean').appendChild(logEl);
+            logIdx++;
+        } else {
+            clearInterval(interval);
+            setTimeout(() => showScreen('result'), 2000); // 분석 완료 후 결과창으로
+        }
+    }, 1000);
+}
+/** [END: 6단계] **/
 
   // ---- Video cover/contain toggle support (for later) ----
   function setVideoFit(mode /* "cover" | "contain" */) {
