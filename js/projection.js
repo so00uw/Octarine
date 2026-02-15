@@ -1,15 +1,19 @@
 (() => {
   const stage = document.getElementById("stage");
   
-  // --- [여기서부터 새로 추가된 변수 선언부] ---
+  // --- [캔버스 선언부] ---
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   canvas.width = 1920;
   canvas.height = 1080;
   stage.appendChild(canvas);
 
-  const vfxOverlay = new Image();
-  vfxOverlay.src = 'assets/img/vfx_grid.png';
+  // --- [비디오 로드 및 설정] ---
+  const vfxVideo = document.createElement('video');
+  vfxVideo.src = 'assets/vfx/digital_scan_loop.mp4';
+  vfxVideo.muted = true;    
+  vfxVideo.loop = true;     
+  vfxVideo.play().catch(e => console.log("VFX 비디오 자동재생 대기중...")); 
 
   const videoInput = document.createElement('video');
   videoInput.autoplay = true;
@@ -26,93 +30,82 @@
       }
   }
   initProjectionCamera();
-  // --- [여기까지] ---
 
   function clearStage() {
     stage.innerHTML = "";
     stage.style.background = "#000";
-    // 캔버스를 다시 붙여주기 위해 stage.appendChild(canvas);를 여기에 넣어도 좋습니다.
+    stage.appendChild(canvas); // 캔버스는 항상 유지
   }
-window.addEventListener("message", (ev) => {
-    const msg = ev.data || {};
-    if (!msg.type) return;
 
-    if (msg.type === "CLEAR") {
-        clearStage();
-        // 다시 캔버스를 붙여줌 (청소 후 재생성)
-        stage.appendChild(canvas);
-    }
+  window.addEventListener("message", (ev) => {
+      const msg = ev.data || {};
+      if (!msg.type) return;
 
-    // [중요] 실시간 얼굴 업데이트 (app.js에서 좌표만 보냄)
-    if (msg.type === "UPDATE_FACE") {
-        // 기존에 넣어둔 drawProjection 함수를 실행
-        // videoElement 자리에 위에서 만든 videoInput을 넣어줌
-        drawProjection(msg.payload.landmarks, videoInput);
-    }
+      if (msg.type === "CLEAR") {
+          clearStage();
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
 
-    if (msg.type === "SHOW_RESULT_FRAME") {
-        clearStage();
-        const img = document.createElement("img");
-        img.src = msg.payload.image;
-        img.className = "fade-in"; // 연출용 클래스
-        img.style.cssText = "position:absolute; width:100%; height:100%; object-fit:cover;";
-        stage.appendChild(img);
-        
-    }
-});
-function drawProjection(faceLandmarks, videoElement) {
-    // 배경을 검정색으로 채움 (마네킹 이외 영역 차단)
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // [스캔/분석 단계] 실시간 얼굴 업데이트
+      if (msg.type === "UPDATE_FACE") {
+          drawProjection(msg.payload.landmarks, videoInput);
+      }
 
-    if (!faceLandmarks) return;
+      // [결과 단계] 결과 프레임 렌더링 (캔버스 위에 직접 그리기)
+      if (msg.type === "SHOW_RESULT_FRAME") {
+          clearStage();
+          
+          const img = new Image();
+          img.onload = () => {
+              // 1. 촬영된 원본 사진 그리기
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              
+              // 2. 초록색 타겟팅 프레임을 캔버스에 직접 그리기 (비율 유지됨)
+              ctx.strokeStyle = "#00ff5a";
+              ctx.lineWidth = 5; // 선 두께
+              ctx.strokeRect(900, 420, 120, 60); // x좌표, y좌표, 가로, 세로
+          };
+          img.src = msg.payload.image;
+      }
+  });
 
-    ctx.save();
-    
-    // 얼굴 외곽선 좌표 (MediaPipe Face Mesh 기준 외곽 인덱스 사용)
-    const outlineIndices = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 10];
+  function drawProjection(faceLandmarks, videoElement) {
+      // 1. 배경 초기화 (검정)
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.beginPath();
-    outlineIndices.forEach((idx, i) => {
-        const point = faceLandmarks[idx];
-        if (i === 0) ctx.moveTo(point.x * canvas.width, point.y * canvas.height);
-        else ctx.lineTo(point.x * canvas.width, point.y * canvas.height);
-    });
-    ctx.closePath();
+      if (!faceLandmarks) return;
 
-    // 마스킹 영역 지정
-    ctx.clip();
+      ctx.save();
+      
+      // 2. 마스킹 (MediaPipe 좌표 기반 얼굴 영역 따기)
+      const outlineIndices = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 10];
 
-    // 1. 얼굴 원본 영상 투사
-    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      outlineIndices.forEach((idx, i) => {
+          const point = faceLandmarks[idx];
+          if (i === 0) ctx.moveTo(point.x * canvas.width, point.y * canvas.height);
+          else ctx.lineTo(point.x * canvas.width, point.y * canvas.height);
+      });
+      ctx.closePath();
+      ctx.clip(); 
 
-    // 2. VFX 오버레이 (Nuke 그리드/입자 효과)
-    ctx.globalAlpha = 0.5; // 투명도 조절
-    ctx.drawImage(vfxOverlay, 0, 0, canvas.width, canvas.height);
-    ctx.globalAlpha = 1.0;
+      // 3. 얼굴 원본 영상 그리기
+      ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
 
-    ctx.restore();
-}
-/** [END: 3단계] **/
+      // 4. VFX 루프 영상 합성 (안전장치 추가!)
+      // 비디오가 로딩 완료(readyState >= 2)되었을 때만 그리도록 하여 에러 방지
+      if (vfxVideo.readyState >= 2) {
+          ctx.globalCompositeOperation = 'screen'; 
+          ctx.globalAlpha = 0.7; 
+          ctx.drawImage(vfxVideo, 0, 0, canvas.width, canvas.height);
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.globalAlpha = 1.0;
+      }
+
+      ctx.restore();
+  }
 
   clearStage();
 })();
-if (msg.type === "SHOW_RESULT_FRAME") {
-  clearStage();
-  const img=document.createElement("img");
-  img.src=msg.payload.image;
-  img.style.position="absolute";
-  img.style.width="100%";
-  img.style.height="100%";
-  img.style.objectFit="cover";
-  stage.appendChild(img);
-
-  const frame=document.createElement("div");
-  frame.style.position="absolute";
-  frame.style.left="900px";
-  frame.style.top="420px";
-  frame.style.width="120px";
-  frame.style.height="60px";
-  frame.style.border="3px solid #00ff5a";
-  stage.appendChild(frame);
-}
