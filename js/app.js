@@ -638,7 +638,7 @@ els.btnRestartFinal?.addEventListener("click", () => {
   // Keep safe if projection window is reloaded: re-clear
   window.addEventListener("focus", () => postToProjection("PING"));
   
-// ---- [새로 추가] 브라우저 창 크기에 맞춰 전체 화면 스케일링 ----
+// ---- 브라우저 창 크기에 맞춰 전체 화면 스케일링 ----
   function resizeApp() {
     const wrapper = document.getElementById('scale-wrapper');
     if (!wrapper) return;
@@ -654,14 +654,13 @@ els.btnRestartFinal?.addEventListener("click", () => {
       scale = window.innerWidth / 1920;
     }
 
-    // 도화지에 scale 적용
-    wrapper.style.transform = `scale(${scale})`;
+    // [핵심 해결] translate(-50%, -50%)를 함께 적용하여 무조건 정중앙에 고정
+    wrapper.style.transform = `translate(-50%, -50%) scale(${scale})`;
   }
 
   window.addEventListener('resize', resizeApp);
   resizeApp(); // 시작할 때 한 번 실행
   // -----------------------------------------------------------
-
   // Start at start screen
   setScreen("start");
 })();
