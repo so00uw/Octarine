@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik+80s+Fade&display=swap');
+
 :root{
   --w: 1920;
   --h: 1080;
@@ -326,6 +328,9 @@ body[data-screen="start"] .steps{
   top:218px;
   width:347px;
   height:300px;
+  font-family: "Rubik 80s Fade", system-ui;
+  font-weight: 400;
+  font-style: normal;
 }
 
 /* 좌측 하단: Data integration */
@@ -334,6 +339,9 @@ body[data-screen="start"] .steps{
   top:520px;
   width:347px;
   height:331px;
+  font-family: "Rubik 80s Fade", system-ui;
+  font-weight: 400;
+  font-style: normal;
 }
 
 /* 우측: Diagnostic Analytics */
@@ -342,6 +350,9 @@ body[data-screen="start"] .steps{
   top:218px;
   width:347px;
   height:637px;
+  font-family: "Rubik 80s Fade", system-ui;
+  font-weight: 400;
+  font-style: normal;
 }
 /* =========================
    RESULT SCREEN
