@@ -661,6 +661,21 @@ els.btnRestartFinal?.addEventListener("click", () => {
     // [핵심 해결] translate(-50%, -50%)를 함께 적용하여 무조건 정중앙에 고정
     wrapper.style.transform = `translate(-50%, -50%) scale(${scale})`;
   }
+  const logoBtn = document.getElementById('invisibleLogoBtn'); 
+  const infoModal = document.getElementById('infoModal');
+  const infoDim = document.querySelector('.info-dim');
+
+  if (logoBtn && infoModal && infoDim) {
+    // 버튼 클릭 시 팝업 열기
+    logoBtn.addEventListener('click', () => {
+      infoModal.classList.remove('hidden');
+    });
+
+    // 검은 배경 클릭 시 팝업 닫기
+    infoDim.addEventListener('click', () => {
+      infoModal.classList.add('hidden');
+    });
+  }
 
   window.addEventListener('resize', resizeApp);
   resizeApp(); // 시작할 때 한 번 실행
