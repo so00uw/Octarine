@@ -465,11 +465,11 @@ if(!landmarks) {
     grade,
     score,
     details:[
-      `상정 비율 ........ ${forehead.toFixed(2)}`,
-      `미간 폭 .......... ${glabella.toFixed(2)}`,
-      `안구 개방도 ...... ${eyeOpen.toFixed(2)}`,
-      `대칭성 ............ ${symmetry.toFixed(2)}`,
-      `종합 지표 ........ ${score.toFixed(2)}`
+      `상정 비율  . . . . . . . . . . . .   ${forehead.toFixed(2)}`,
+      `미간 폭  . . . . . . . . . . . . .   ${glabella.toFixed(2)}`,
+      `안구 개방도  . . . . . . . . . .   ${eyeOpen.toFixed(2)}`,
+      `대칭성  . . . . . . . . . . . . . . . .   ${symmetry.toFixed(2)}`,
+      `종합 지표  . . . . . . . . . . . .   ${score.toFixed(2)}`
     ]
   };
 }
@@ -539,7 +539,7 @@ const intel=calcIntelligence(capturedLandmarks);
   const crimeList=document.getElementById("crimeScores");
   crimeList.innerHTML="";
   Object.entries(crimes).forEach(([k,v])=>{
-    crimeList.innerHTML+=`<div>${k} ...... ${v}점</div>`;
+    crimeList.innerHTML+=`<div>${k} . . . . . . . . . . . . ${v}점</div>`;
   });
 
   const top=Object.entries(crimes)

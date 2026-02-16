@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik+80s+Fade&display=swap');
-
+@import url('https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css');
 :root{
   --w: 1920;
   --h: 1080;
@@ -142,18 +142,24 @@ html, body {
 }
 .panel-title{
   margin:0 0 10px;
+  font-family: 'SUIT', sans-serif;
   font-size:28px;
+  text-align: center;
 }
 .panel-desc{
   margin:0 0 18px;
   opacity:.75;
   line-height:1.4;
+  font-family: 'SUIT', sans-serif;
+  font-size:22px;
 }
 .consent-list{
   display:flex;
   flex-direction:column;
   gap:12px;
   margin-bottom:18px;
+  font-family: 'SUIT', sans-serif;
+  font-size:20px;
 }
 .check{
   display:flex;
@@ -169,6 +175,7 @@ html, body {
   background: rgba(255,255,255,0.08);
   color:#fff;
   cursor:pointer;
+  font-family: 'SUIT', sans-serif;
 }
 .btn-next:disabled{
   opacity:.35;
@@ -216,17 +223,20 @@ body[data-screen="start"] .steps{
   top:351px;
   width:289px;
   height:301px;
-  border:4px solid #00ff5a;
+  border:4px solid #00ff00;
   pointer-events:none;
 }
 
 /* Hint text */
 .scan-hint{
   position:absolute;
-  left:120px;
-  bottom:120px;
+  left:50%;
+  transform:translateX(-50%);
+  text-align: center;
+  bottom: 120px;
   font-size:28px;
   opacity:.8;
+  font-family: 'SUIT', sans-serif;
 }
 
 /* Capture button */
@@ -237,9 +247,9 @@ body[data-screen="start"] .steps{
   width:220px;
   height:70px;
   font-size:22px;
-  background:#444;
+  background:#000000;
   border:none;
-  color:#fff;
+  color:#000000;
   border-radius:12px;
   cursor:not-allowed;
   transition:.2s;
@@ -372,47 +382,32 @@ body[data-screen="start"] .steps{
   object-fit:cover;
 }
 
-/* 얼굴 프레임 (연출 고정 위치) */
-.frame-eye{
-  position:absolute;
-  left:900px;
-  top:420px;
-  width:120px;
-  height:60px;
-  border:3px solid #00ff5a;
-}
-.frame-mouth{
-  position:absolute;
-  left:890px;
-  top:600px;
-  width:150px;
-  height:70px;
-  border:3px solid #00ff5a;
-}
 
 /* Intelligence */
 .intel-block {
   position: absolute;
 
-  left: 142px;      /* ← 좌우 이동 */
-  top: 298px;       /* ← 상하 이동 */
+  left: 71px;      /* ← 좌우 이동 */
+  top: 228px;       /* ← 상하 이동 */
 
   width: 420px;     /* ← 텍스트 영역 폭 */
   z-index: 5;
+  font-family: 'SUIT', sans-serif;
 }
 
 .intel-title {
   font-size: 40px;
   margin-bottom: 50px;
-    color: rgb(0, 0, 0);;
+  color: rgb(0, 0, 0);;
+  font-weight: 700;
 
 }
 
 #intelGrade{ 
   position:absolute; left:190px; top:0;
   font-size: 42px;
-    color: rgb(0, 0, 0);;
-
+  color: rgb(0, 0, 0);;
+  font-weight: 700;
  }
 .intel-details {
   margin-top: 10px;
@@ -422,7 +417,7 @@ body[data-screen="start"] .steps{
 
 }
 #intelDetails div{
-  font-size: 20px;
+  font-size: 25px;
   margin-bottom: 10px;
 }
 
@@ -430,11 +425,12 @@ body[data-screen="start"] .steps{
 .crime-block {
   position: absolute;
 
-  left: 1312px;   
-  top: 530px;
+  left: 1356px;   
+  bottom: 260px;
 
   width: 660px;
   z-index: 5;
+  font-family: 'SUIT', sans-serif;
 }
 
 .crime-title{ 
@@ -442,6 +438,7 @@ body[data-screen="start"] .steps{
   font-size: 0px;
   color: rgb(0, 0, 0);;
  }
+
 .crime-scores {
   font-size: 24px;
   line-height: 40px;
@@ -459,18 +456,19 @@ body[data-screen="start"] .steps{
   top: 330px;
 
   font-size: 40px;
-      color: rgb(0, 0, 0);;
-
+    color: rgb(0, 0, 0);;
+  font-weight: 700;
 }
 
 .btn-restart{
   position:absolute;
-  bottom:70px;
+  bottom:10px;
   left:50%;
   transform:translateX(-50%);
   width:260px;
   height:50px;
   font-size:22px;
+  font-family: 'SUIT', sans-serif;
 }
 #screen-result .camera-box { position:absolute; } /* 기존 camera-box 규칙 유지 */
 #resultPhoto{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; }
