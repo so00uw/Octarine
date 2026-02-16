@@ -371,6 +371,10 @@ function startAnalyze() {
     if (!capturedImageDataUrl) { setScreen("start"); return; }
 
     photo.src = capturedImageDataUrl;
+
+    photo.style.display = "block";
+    line.style.display = "block";
+    line.style.animation = "scanMove 3s linear infinite";
     
     // 1. 오른쪽 영역 (기존 폭포수 애니메이션 적용)
     fillLogStream(diagn, 220); 

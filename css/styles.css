@@ -318,11 +318,19 @@ body[data-screen="start"] .steps{
   left:0;
   top:0;
   width:100%;
-  height:4px;
-  background:#00ff5a;
+  height:6px;
+  background:#00ff00;
   opacity:0.9;
   transform: translateY(-10px);
   display:none;
+  z-index: 10;
+  will-change: top, opacity;
+}
+@keyframes scanMove {
+  0%   { top: 0%; opacity: 0; }
+  10%  { opacity: 0.9; } /* 나타나기 */
+  90%  { opacity: 0.9; } /* 유지하기 */
+  100% { top: 100%; opacity: 0; } /* 바닥에 닿으면 투명해지기 */
 }
 
 /* Log blocks positioning (based on your analyze mock) */
@@ -398,6 +406,20 @@ body[data-screen="start"] .steps{
   width: 100%;
   height: 100%;
   z-index: -1;
+}
+/* =========================================
+   분석 화면: 오른쪽 폭포수 애니메이션 (수정본)
+   ========================================= */
+.lb-diagn .log-stream {
+  /* 시간을 8s -> 30s로 확 늘려서 속도를 자연스럽게 낮춤 */
+  animation: waterfallUp 30s linear infinite; 
+}
+
+/* 폭포수 마법의 키프레임 */
+@keyframes waterfallUp {
+  /* 100% 였던 시작 위치를 0%로 바꿔서 딜레이 없이 즉각 보이면서 올라가게 함 */
+  0%   { transform: translateY(0%); }   
+  100% { transform: translateY(-100%); } 
 }
 /* =========================
    RESULT SCREEN
