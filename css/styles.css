@@ -497,13 +497,25 @@ body[data-screen="start"] .steps{
 
 .btn-restart{
   position:absolute;
-  bottom:10px;
+  bottom:80px;
   left:50%;
   transform:translateX(-50%);
   width:260px;
   height:50px;
   font-size:22px;
   font-family: 'SUIT', sans-serif;
+  background: none;
+  border: none;
+  color: #0eff0e00;
+  cursor: pointer;
+  z-index: 5;
+}
+.restart-deco{
+  position: absolute;
+  width: 150px;
+  right: 880px;
+  bottom: 80px;
+  z-index: 4;
 }
 #screen-result .camera-box { position:absolute; } /* 기존 camera-box 규칙 유지 */
 #resultPhoto{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; }
