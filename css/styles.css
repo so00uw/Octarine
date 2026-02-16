@@ -119,6 +119,8 @@ html, body {
 /* Start button */
 .btn-image{
   position:relative;
+  left: 394px;
+  bottom: 70px;
   z-index:1;
   border:0;
   background:transparent;
@@ -126,9 +128,16 @@ html, body {
   cursor:pointer;
 }
 .btn-image img{
-  width:555px;
-  height:158px;
+  width:240px;
+  height:63px;
   display:block;
+}
+.deco-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 /* Generic panel placeholders */

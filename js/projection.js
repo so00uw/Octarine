@@ -18,6 +18,7 @@
   const videoInput = document.createElement('video');
   videoInput.autoplay = true;
   videoInput.playsinline = true;
+  videoInput.muted = true;
 
   async function initProjectionCamera() {
       try {
