@@ -38,7 +38,7 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #000;
+  background: #00000000;
 }
 /* 추가: 배경 비디오가 .app 크기에 딱 맞도록 보강 */
 .bg-video {
@@ -60,6 +60,7 @@ html, body {
   justify-content:center;
   z-index:10;
   pointer-events:none;    /* 로고/아이콘은 기능 없음 */
+  z-index: -2;
 }
 
 .topbar-inner{
@@ -190,6 +191,15 @@ html, body {
   opacity:.35;
   cursor:not-allowed;
 }
+.consent-deco{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
 /* 시작 화면에서는 단계 아이콘만 숨김 (로고는 유지) */
 body[data-screen="start"] .steps{
   display: none;
@@ -209,7 +219,7 @@ body[data-screen="start"] .steps{
 .camera-box{
   position:absolute;
   left:558px;
-  top:191px;
+  top:201px;
   width:805px;
   height:672px;
   background:#111;
@@ -268,6 +278,14 @@ body[data-screen="start"] .steps{
   background:#00ff5a;
   color:#000;
   cursor:pointer;
+}
+.scan-deco{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
 }
 /* =========================
    ANALYZE SCREEN (Step 4)
@@ -373,6 +391,14 @@ body[data-screen="start"] .steps{
   font-weight: 400;
   font-style: normal;
 }
+.analyze-deco{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
 /* =========================
    RESULT SCREEN
 ========================= */
@@ -396,8 +422,8 @@ body[data-screen="start"] .steps{
 .intel-block {
   position: absolute;
 
-  left: 71px;      /* ← 좌우 이동 */
-  top: 228px;       /* ← 상하 이동 */
+  left: 348px;      /* ← 좌우 이동 */
+  top: 303px;       /* ← 상하 이동 */
 
   width: 420px;     /* ← 텍스트 영역 폭 */
   z-index: 5;
@@ -405,28 +431,28 @@ body[data-screen="start"] .steps{
 }
 
 .intel-title {
-  font-size: 40px;
-  margin-bottom: 50px;
+  font-size: 34px;
+  margin-bottom: 25px;
   color: rgb(0, 0, 0);;
-  font-weight: 700;
+  font-weight: 600;
 
 }
 
 #intelGrade{ 
   position:absolute; left:190px; top:0;
-  font-size: 42px;
+  font-size: 34px;
   color: rgb(0, 0, 0);;
-  font-weight: 700;
+  font-weight: 600;
  }
 .intel-details {
   margin-top: 10px;
-  font-size: 22px;
-  line-height: 36px;
+  font-size: 20px;
+  line-height: 25px;
     color: #3f3;;
 
 }
 #intelDetails div{
-  font-size: 25px;
+  font-size: 20px;
   margin-bottom: 10px;
 }
 
@@ -434,8 +460,8 @@ body[data-screen="start"] .steps{
 .crime-block {
   position: absolute;
 
-  left: 1356px;   
-  bottom: 260px;
+  left: 1216px;   
+  bottom: 380px;
 
   width: 660px;
   z-index: 5;
@@ -449,24 +475,24 @@ body[data-screen="start"] .steps{
  }
 
 .crime-scores {
-  font-size: 24px;
-  line-height: 40px;
+  font-size: 20px;
+  line-height: 32px;
       color: #3f3;;
 
 }
 #crimeScores div{
-  font-size: 24px;
+  font-size: 20px;
   margin-bottom: 10px;
  }
 .crime-top {
   position: absolute;
 
   left: 5px;
-  top: 330px;
+  top: 265px;
 
-  font-size: 40px;
+  font-size: 34px;
     color: rgb(0, 0, 0);;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .btn-restart{

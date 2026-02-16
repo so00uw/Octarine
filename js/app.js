@@ -546,7 +546,7 @@ const intel=calcIntelligence(capturedLandmarks);
     .sort((a,b)=>b[1]-a[1])[0];
 
   document.getElementById("crimeTop").textContent=
-    `범죄 예정 유형: ${top[0]}`;
+    `범죄 유형: ${top[0]}`;
 
   // 프로젝터 창으로 얼굴+프레임만 전송
   postToProjection("SHOW_RESULT_FRAME",{
