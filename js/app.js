@@ -307,8 +307,10 @@ function onFaceResults(results) {
     capturedLandmarks = JSON.parse(JSON.stringify(lastLandmarks));
 
     // 프로젝션 창에 촬영 이미지 전송
-    postToProjection("SHOW_RESULT_FRAME", { image: capturedImageDataUrl });
-
+    postToProjection("SHOW_RESULT_FRAME", { 
+        image: capturedImageDataUrl,
+        landmarks: capturedLandmarks 
+    });
     stableFrames = 0;
     setScreen("analyze");
   } else {
@@ -554,7 +556,8 @@ const intel=calcIntelligence(capturedLandmarks);
 
   // 프로젝터 창으로 얼굴+프레임만 전송
   postToProjection("SHOW_RESULT_FRAME",{
-    image:capturedImageDataUrl
+    image: capturedImageDataUrl,
+    landmarks: capturedLandmarks 
   });
 }
 
